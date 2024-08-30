@@ -10,19 +10,9 @@ import uuid
 from pathlib import Path
 from demo.faces import detect_faces, recognize_face, train_face_recognizer
 
-
 logging.basicConfig(level=logging.DEBUG)
 
 training_data_folder = Path("images")
-
-show_capture_dialog = False
-capture_image = False
-show_add_captured_images_dialog = False
-
-labeled_faces = []  # Contains rect with label (for UI component)
-
-captured_image = None
-captured_label = ""
 
 
 def on_action_captured_image(state, id, payload):
@@ -102,7 +92,17 @@ def button_retrain_clicked(state):
     notify(state, "s", "Retrained!")
 
 
-webcam_md = """<|toggle|theme|>
+if __name__ == "__main__":
+    show_capture_dialog = False
+    capture_image = False
+    show_add_captured_images_dialog = False
+
+    labeled_faces = []  # Contains rect with label (for UI component)
+
+    captured_image = None
+    captured_label = ""
+
+    webcam_md = """<|toggle|theme|>
 
 <container|container|part|
 
@@ -136,9 +136,8 @@ Wait for your face to be detected. Then, capture your face, provide your name, a
 
 <|{captured_label}|input|>
 |>
-"""
+    """
 
-if __name__ == "__main__":
     # Create dir where the pictures will be stored
     if not training_data_folder.exists():
         training_data_folder.mkdir()
@@ -148,3 +147,4 @@ if __name__ == "__main__":
     gui = Gui(webcam_md)
     gui.add_library(Webcam())
     gui.run(title='Face Recognition')
+

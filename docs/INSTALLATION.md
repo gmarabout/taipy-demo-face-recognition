@@ -9,29 +9,46 @@ To install this demo:
 
 ```
 git clone git@github.com:Avaiga/demo-demo-face-recognition.git
-cd demo-face-recognition
+cd demo-face-recognition/src
 ```
 
 To install the dependencies:
 ```
-pipenv install
+pip install -r requirements.txt
 ```
 
-or, if you want to develop in the demo:
-```
-pipenv install --dev
-```
+## Building the Webam component
 
-Then you need to build the front-end JavaScript:
+- Clone the taipy-2-2 branch to build the front-end JavaScript,
 
 ```
-cd taipy-demo-face-recognition/webcam/webui
-npm install
-npm build
+pip install taipy==2.2
+pip install opencv-python-headless==4.7.0.72
+pip install opencv-contrib-python-headless==4.7.0.72
+pip install pillow
+```
+
+- Run this command:
+
+```
+cd demo-face-recognition/webcam/webui
+npm i
+```
+
+- Find the location of taipy-gui with the `find_taipy_gui_dir.py` script and run:
+
+```
+ npm i <path to taipy-gui>
+```
+
+- Change `webpack.config.js` with taipy-gui path and run:
+
+```
+npm run build
 ```
 
 
-And finally, to run the demo:
+Finally, to run the demo:
 ```
-pipenv run python main.py
+python main.py
 ```
