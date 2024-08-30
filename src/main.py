@@ -17,7 +17,6 @@ training_data_folder = Path("images")
 
 def on_action_captured_image(state, id, payload):
     print("Captured image")
-
     choice = payload["args"][0]
     if choice == 0:
         notify(state, "i", "Adding image to database...")
@@ -59,12 +58,10 @@ def process_image(state, frame):
         state.captured_label = label
         state.show_capture_dialog = True
         state.capture_image = False
-        
 
 
 def handle_image(state, action, args):
     print("Handling image...")
-
     payload = args["args"][0]
     bytes = payload["data"]
     logging.debug(f"Received data: {len(bytes)}")
@@ -147,4 +144,3 @@ Wait for your face to be detected. Then, capture your face, provide your name, a
     gui = Gui(webcam_md)
     gui.add_library(Webcam())
     gui.run(title='Face Recognition')
-
