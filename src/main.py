@@ -1,4 +1,4 @@
-from taipy.gui import Gui
+from taipy.gui import Gui, notify
 from webcam import Webcam
 import cv2
 
@@ -15,10 +15,11 @@ logging.basicConfig(level=logging.DEBUG)
 training_data_folder = Path("images")
 
 
-def on_action_captured_image(state, id, action, payload):
+def on_action_captured_image(state, id, payload):
     print("Captured image")
     choice = payload["args"][0]
     if choice == 0:
+        notify(state, "i", "Adding image to database...")
         # Add image to training data:
         img = state.captured_image
         file_name = str(uuid.uuid4()) + ".jpg"
@@ -29,6 +30,7 @@ def on_action_captured_image(state, id, action, payload):
         label_file_path = Path(training_data_folder, "data.csv")
         with label_file_path.open("a") as f:
             f.write(f"{file_name},{label}\n")
+        notify(state, "s", "Image added to database")
 
     state.captured_image = None
     state.captured_label = ""
@@ -49,6 +51,7 @@ def process_image(state, frame):
 
     # Capture image (actually we consider only the first detected face)
     if state.capture_image and len(labeled_images) > 0:
+        notify(state, "i", "Capturing image...")
         img = labeled_images[0][0]
         label = labeled_images[0][2]
         state.captured_image = cv2.imencode(".jpg", img)[1].tobytes()
@@ -57,9 +60,9 @@ def process_image(state, frame):
         state.capture_image = False
 
 
-def handle_image(state, action, args, value):
+def handle_image(state, action, args):
     print("Handling image...")
-    payload = value["args"][0]
+    payload = args["args"][0]
     bytes = payload["data"]
     logging.debug(f"Received data: {len(bytes)}")
 
@@ -73,6 +76,7 @@ def handle_image(state, action, args, value):
         img = cv2.imread(temp_path, cv2.IMREAD_UNCHANGED)
     except cv2.error as e:
         logging.error(f"Failed to read image file: {e}")
+        notify(state, "e", f"Failed to read image file: {e}")
         return
     process_image(state, img)
     # Finish. Tempfile is removed.
@@ -80,7 +84,9 @@ def handle_image(state, action, args, value):
 
 def button_retrain_clicked(state):
     print("Retraining...")
+    notify(state, "i", "Retraining...")
     train_face_recognizer(training_data_folder)
+    notify(state, "s", "Retrained!")
 
 
 if __name__ == "__main__":
@@ -105,6 +111,8 @@ This demo shows how to use [Taipy](https://taipy.io/) with a [custom GUI compone
 
 - How to detect and recognize faces in the image in real time using [OpenCV](https://opencv.org/).
 
+
+Wait for your face to be detected. Then, capture your face, provide your name, and retrain the model.
 <br/>
 
 <card|card p-half|part|
@@ -135,4 +143,4 @@ This demo shows how to use [Taipy](https://taipy.io/) with a [custom GUI compone
 
     gui = Gui(webcam_md)
     gui.add_library(Webcam())
-    gui.run(port=9090)
+    gui.run(title='Face Recognition')
