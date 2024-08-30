@@ -25,8 +25,9 @@ captured_image = None
 captured_label = ""
 
 
-def on_action_captured_image(state, id, action, payload):
+def on_action_captured_image(state, id, payload):
     print("Captured image")
+
     choice = payload["args"][0]
     if choice == 0:
         notify(state, "i", "Adding image to database...")
@@ -71,9 +72,10 @@ def process_image(state, frame):
         
 
 
-def handle_image(state, action, args, value):
+def handle_image(state, action, args):
     print("Handling image...")
-    payload = value["args"][0]
+
+    payload = args["args"][0]
     bytes = payload["data"]
     logging.debug(f"Received data: {len(bytes)}")
 
