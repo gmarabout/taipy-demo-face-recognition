@@ -17,7 +17,18 @@ WORKDIR /app
 COPY src/requirements.txt .
 RUN pip install -r requirements.txt
 
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash && apt install nodejs
+
+# Install the node components.
+COPY src/webcam/webui /tmp/webui
+RUN npm i /tmp/webui/
+
 # Copy the application source code.
 COPY src .
+
+# Build the extension.
+RUN  cd webcam/webui && rm package-lock.json && npm i && \
+    npm i /usr/local/lib/python3.11/site-packages/taipy/gui/webapp && \
+    npm run build && cd -
 
 CMD ["taipy", "run", "--no-debug", "--no-reloader", "main.py", "-H", "0.0.0.0", "-P", "5000"]
